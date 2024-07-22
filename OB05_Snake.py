@@ -14,6 +14,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
+HEAD_COLOR = (0, 128, 0)  # Darker green for the head
 
 # Snake block size
 BLOCK_SIZE = 20
@@ -27,6 +28,20 @@ clock = pygame.time.Clock()
 
 # Font
 font = pygame.font.SysFont(None, 35)
+
+# Load head image
+try:
+    head_image = pygame.image.load('snake_head.png')
+    head_image = pygame.transform.scale(head_image, (BLOCK_SIZE, BLOCK_SIZE))
+except pygame.error:
+    head_image = None
+
+# Load body image
+try:
+    body_image = pygame.image.load('snake_body.png')
+    body_image = pygame.transform.scale(body_image, (BLOCK_SIZE, BLOCK_SIZE))
+except pygame.error:
+    body_image = None
 
 def message(msg, color, x, y):
     text = font.render(msg, True, color)
@@ -70,16 +85,16 @@ def game_loop():
             if event.type == pygame.QUIT:
                 game_over = True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT and x1_change == 0:
                     x1_change = -BLOCK_SIZE
                     y1_change = 0
-                elif event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT and x1_change == 0:
                     x1_change = BLOCK_SIZE
                     y1_change = 0
-                elif event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP and y1_change == 0:
                     y1_change = -BLOCK_SIZE
                     x1_change = 0
-                elif event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN and y1_change == 0:
                     y1_change = BLOCK_SIZE
                     x1_change = 0
 
@@ -100,8 +115,18 @@ def game_loop():
             if x == snake_Head:
                 game_close = True
 
-        for block in snake_List:
-            pygame.draw.rect(screen, WHITE, [block[0], block[1], BLOCK_SIZE, BLOCK_SIZE])
+        # Draw the snake body
+        for block in snake_List[:-1]:
+            if body_image:
+                screen.blit(body_image, (block[0], block[1]))
+            else:
+                pygame.draw.rect(screen, WHITE, [block[0], block[1], BLOCK_SIZE, BLOCK_SIZE])
+
+        # Draw the head
+        if head_image:
+            screen.blit(head_image, (snake_List[-1][0], snake_List[-1][1]))
+        else:
+            pygame.draw.rect(screen, HEAD_COLOR, [snake_List[-1][0], snake_List[-1][1], BLOCK_SIZE, BLOCK_SIZE])
 
         pygame.display.update()
 
