@@ -1,51 +1,46 @@
-# Разработать консольную игру "Битва героев" на Python с использованием классов и
-# разработать план проекта по этапам/или создать kanban доску для работы над данным проектом
-#Общее описание:
-#Создайте простую текстовую боевую игру, где игрок и компьютер управляют героями с различными
-# характеристиками. Игра состоит из раундов, в каждом раунде игроки по очереди наносят урон друг другу,
-# пока у одного из героев не закончится здоровье.
+import random
 
-# Класс `Hero`:
-# - Атрибуты:
-# - Имя (`name`)
-# - Здоровье (`health`), начальное значение 100
-# - Сила удара (`attack_power`), начальное значение 20
-# - Методы:
-# - `attack(other)`: атакует другого героя (`other`), отнимая здоровье в размере своей силы удара
-# # - `is_alive()`: возвращает `True`, если здоровье героя больше 0, иначе `False`
-# Класс `Game`:
-# - Атрибуты:
-# - Игрок (`player`), экземпляр класса `Hero`
-# - Компьютер (`computer`), экземпляр класса `Hero`
-# - Методы:
-# - `start()`: начинает игру, чередует ходы игрока и компьютера, пока один из героев не умрет.
-# Выводит информацию о каждом ходе (кто атаковал и сколько здоровья осталось у противника) и объявляет победителя.
-
-class Hero():
+class Hero:
     def __init__(self, name, health=100, attack_power=20):
         self.name = name
         self.health = health
         self.attack_power = attack_power
 
-    def attack(self):
-        if self.attack_power > 0:
-            print(f'{self.name} атакует')
-            self.attack_power -= 2
-            self.health -= 1
-            print(f'Сила удара - {self.attack_power}')
-        else:
-            print(f'{self.name} обессилен')
-
+    def attack(self, other):
+        damage = self.attack_power
+        other.health -= damage
+        print(f"{self.name} атакует {other.name} и наносит {damage} урона.")
 
     def is_alive(self):
-        if self.health > 0:
-            pass
-        else:
-            print(f'{self.name} мертв')
+        return self.health > 0
 
-hero = Hero("Витязь", 100, 20)
+class Game:
+    def __init__(self, player, computer):
+        self.player = player
+        self.computer = computer
 
-hero.attack()
-hero.attack()
-hero.attack()
-hero.is_alive()
+    def start(self):
+        print("Игра начинается!")
+        while self.player.is_alive() and self.computer.is_alive():
+            if random.choice([True, False]):
+                self.player.attack(self.computer)
+            else:
+                self.computer.attack(self.player)
+
+            self._print_health()
+
+            if not self.player.is_alive():
+                print(f"{self.player.name} проиграл! {self.computer.name} победил!")
+                break
+            elif not self.computer.is_alive():
+                print(f"{self.computer.name} проиграл! {self.player.name} победил!")
+                break
+
+    def _print_health(self):
+        print(f"Здоровье {self.player.name}: {self.player.health}")
+        print(f"Здоровье {self.computer.name}: {self.computer.health}")
+
+player_hero = Hero("Витязь")
+computer_hero = Hero("Компьютер")
+game = Game(player=player_hero, computer=computer_hero)
+game.start()
